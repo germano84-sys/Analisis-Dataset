@@ -2,202 +2,228 @@
 
 ## 📋 Descripción del Proyecto
 
-Este proyecto implementa un análisis completo del conjunto de datos del Titanic usando técnicas de Machine Learning. El objetivo es desarrollar modelos predictivos capaces de determinar si un pasajero sobrevivió al hundimiento del Titanic basándose en características como edad, sexo, clase de pasajero, entre otros.
+Este proyecto analiza el dataset del Titanic para predecir la supervivencia de pasajeros usando modelos de clasificación.
+Se realiza una limpieza de datos, transformación de características, entrenamiento de modelos y evaluación con métricas reales.
 
-El proyecto demuestra todo el flujo de trabajo de ciencia de datos:
-- **Carga y exploración de datos**
-- **Preprocesamiento y limpieza de datos**
-- **Transformación de características**
-- **Entrenamiento de múltiples modelos**
-- **Evaluación y comparación de rendimiento**
-- **Generación de predicciones**
+El flujo del proyecto incluye:
+- Carga y exploración del dataset
+- Identificación y tratamiento de valores faltantes
+- Transformación de variables categóricas
+- Entrenamiento y comparación de modelos de clasificación
+- Generación de predicciones finales en `submission.csv`
 
 ---
 
 ## 🎯 Objetivo
 
-Desarrollar un modelo de clasificación que prediga con precisión si un pasajero del Titanic sobrevivió al desastre. Se utilizan múltiples algoritmos de Machine Learning para comparar su rendimiento y seleccionar el más adecuado.
+Construir un modelo que prediga si un pasajero habría sobrevivido o no usando los datos disponibles de entrenamiento.
 
 ---
 
 ## 📊 Datasets Utilizados
 
-### Archivos de entrada:
-- `train.csv` - Datos de entrenamiento (891 pasajeros) con información de supervivencia
-- `test.csv` - Datos de prueba (418 pasajeros) sin información de supervivencia
-- `gender_submission.csv` - Archivo de referencia para las predicciones
+### Archivos principales:
+- `train.csv` - Datos de entrenamiento (891 registros)
+- `test.csv` - Datos de prueba (418 registros)
+- `gender_submission.csv` - Plantilla de referencia para la entrega en Kaggle
+- `submission.csv` - Predicciones generadas por el proyecto
 
-### Características principales:
-- **PassengerId**: Identificador único del pasajero
-- **Survived**: Indicador de supervivencia (0 = No sobrevivió, 1 = Sobrevivió)
-- **Pclass**: Clase del pasajero (1ª, 2ª, 3ª clase)
-- **Sex**: Sexo del pasajero
-- **Age**: Edad del pasajero
-- **SibSp**: Número de hermanos/cónyuge a bordo
-- **Parch**: Número de padres/hijos a bordo
-- **Fare**: Tarifa pagada
-- **Embarked**: Puerto de embarque (C = Cherburgo, Q = Queenstown, S = Southampton)
+### Resumen de dimensiones:
+- `train.csv`: 891 filas, 12 columnas
+- `test.csv`: 418 filas, 11 columnas
+- `submission.csv`: 418 filas, 2 columnas
+
+### Variables clave:
+- `PassengerId`: ID del pasajero
+- `Survived`: 0 = No sobrevivió, 1 = Sobrevivió
+- `Pclass`: Clase del pasajero
+- `Sex`: Sexo del pasajero
+- `Age`: Edad
+- `SibSp`: Hermanos/esposos a bordo
+- `Parch`: Padres/hijos a bordo
+- `Fare`: Tarifa pagada
+- `Embarked`: Puerto de embarque
 
 ---
 
 ## 🔧 Procesamiento de Datos
 
-### 1. Carga de datos
-Se cargan los conjuntos de entrenamiento usando pandas.
+### 1. Carga y limpieza inicial
+- Se carga el dataset de entrenamiento con pandas.
+- Se identifica que hay valores faltantes en varias columnas:
+  - `Age`: 177 valores faltantes
+  - `Cabin`: 687 valores faltantes
+  - `Embarked`: 2 valores faltantes
 
-### 2. Análisis de valores faltantes
-```
-Valores faltantes detectados:
-- Age: 177 valores faltantes
-- Cabin: 687 valores faltantes
-- Embarked: 2 valores faltantes
-```
+### 2. Tratamiento de valores faltantes
+- `Age` se rellena con 0
+- `Cabin` se rellena con 0 y luego se elimina porque tiene demasiados datos faltantes
+- `Embarked` se rellena con 0
 
-### 3. Mapa de calor de valores faltantes
-![Heatmap de valores faltantes](https://via.placeholder.com/600x400?text=Heatmap+de+Valores+Faltantes)
+### 3. Eliminación de columnas irrelevantes
+Se eliminan columnas que no contribuyen a la predicción directa:
+- `Name`
+- `PassengerId`
+- `Ticket`
+- `Cabin`
 
-**Explicación**: Este gráfico visualiza la distribución de valores faltantes en el conjunto de datos. Las áreas oscuras representan datos ausentes, permitiendo identificar rápidamente qué columnas tienen más valores vacíos. En este caso, la columna "Cabin" tiene la mayoría de valores faltantes.
+### 4. Codificación de variables categóricas
+- `Sex`: female → 0, male → 1
+- `Embarked`: se descompone en tres variables binarias:
+  - `Embarked_S`
+  - `Embarked_Q`
+  - `Embarked_C`
 
-### 4. Tratamiento de valores faltantes
-- **Age**: Rellena con 0 (usando media o mediana sería más apropiado en un análisis real)
-- **Cabin**: Eliminada por tener demasiados valores faltantes
-- **Embarked**: Rellena con el valor más frecuente
-
-### 5. Codificación de variables categóricas
-- **Sex**: Convertida a valores numéricos (female=0, male=1)
-- **Embarked**: Convertida a variables binarias (one-hot encoding)
-  - Embarked_S, Embarked_Q, Embarked_C
-
-### 6. Eliminación de características
-Se eliminan las siguientes columnas por no ser necesarias:
-- Name, PassengerId, Ticket, Cabin, Embarked (original), Sex (original)
+### 5. Selección de características finales
+Las características usadas por los modelos son:
+- `Pclass`
+- `Age`
+- `SibSp`
+- `Parch`
+- `Fare`
+- `Embarked_S`
+- `Embarked_Q`
+- `Embarked_C`
 
 ---
 
-## 🧪 División de Datos
+## 📈 Gráficos Generados y su Interpretación
 
-Los datos se dividen en:
-- **Entrenamiento (66%)**: 591 muestras
-- **Prueba (34%)**: 277 muestras
+Los gráficos generados se guardan en `figures/` y explican la distribución de datos, los valores faltantes y las relaciones clave del dataset.
 
-La división se realiza de forma aleatoria para garantizar una evaluación objetiva del modelo.
+### 1. Distribución de Edad
+![Distribución de Edad](figures/age_histogram.png)
+- La mayoría de los pasajeros tenía entre 20 y 40 años.
+- Hay pocos niños y un pequeño grupo de personas mayores.
+- Esta distribución ayuda a entender cómo la edad puede influir en la supervivencia.
+
+### 2. Distribución de Tarifas
+![Distribución de Tarifas](figures/fare_histogram.png)
+- La tarifa es muy asimétrica, con muchos montos bajos y algunos valores extremos altos.
+- Los valores altos suelen corresponder a pasajeros de primera clase.
+- Por eso se normaliza la tarifa antes de entrenar los modelos.
+
+### 3. Mapa de calor de valores faltantes
+![Valores Faltantes](figures/missing_values_heatmap.png)
+- `Cabin` es la columna con más datos faltantes.
+- `Age` y `Embarked` también tienen datos ausentes.
+- Esta visualización justifica la imputación y la eliminación de columnas.
+
+### 4. Supervivencia por Sexo
+![Supervivencia por Sexo](figures/survival_by_sex.png)
+- Las mujeres muestran una tasa de supervivencia mucho mayor que los hombres.
+- Esta diferencia es uno de los patrones más fuertes del dataset.
+- El sexo es una variable predictiva clave.
+
+### 5. Supervivencia por Clase
+![Supervivencia por Clase](figures/survival_by_pclass.png)
+- Los pasajeros de primera clase sobreviven con mayor frecuencia.
+- La clase económica tiene la menor tasa de supervivencia.
+- Esto confirma que la clase social influye en la probabilidad de sobrevivir.
+
+### 6. Supervivencia por Puerto de Embarque
+![Supervivencia por Embarque](figures/survival_by_embarked.png)
+- Hay diferencias en supervivencia según el puerto de embarque.
+- Aporto información adicional que puede colaborar con otras variables.
+- Se usa junto con `Sex` y `Pclass` para caracterizar mejor a los pasajeros.
+
+### 7. Mapa de calor de correlaciones
+![Correlaciones](figures/correlation_heatmap.png)
+- Muestra cómo se relacionan `Survived`, `Pclass`, `Age`, `SibSp`, `Parch` y `Fare`.
+- `Fare` y `Pclass` están correlacionados con la supervivencia.
+- Esta gráfica ayuda a identificar variables que aportan más señal al modelo.
 
 ---
 
 ## 🔬 Transformación de Características
 
-Se utiliza `ColumnTransformer` para aplicar diferentes transformaciones:
+Se define un `ColumnTransformer` con:
+- `StandardScaler` para normalizar columnas numéricas
+- `KBinsDiscretizer` para discretizar `SibSp`
+- `Binarizer` configurado, aunque en la versión actual no se aplica a columnas activas
 
-### Técnicas aplicadas:
-1. **StandardScaler** (7 columnas): Normaliza características numéricas a media=0, desviación=1
-   - Columnas: Pclass, SibSp, Parch, Fare, Embarked_S, Embarked_Q, Embarked_C
-
-2. **KBinsDiscretizer** (1 columna): Divide una característica en intervalos discretos
-   - Columna: Age (convertida en bins)
+Esto garantiza que las características tengan rangos comparables antes de entrenar los modelos.
 
 ---
 
 ## 🤖 Modelos Entrenados
 
 ### Modelo 1: K-Nearest Neighbors (KNN)
-**Descripción**: Algoritmo que clasifica un punto basándose en sus k vecinos más cercanos.
-
-**Parámetros**:
-- n_neighbors = 9
-- Métrica de distancia: Euclidiana (por defecto)
-
-**Rendimiento**:
-- **Precisión en datos de prueba: 71.29%**
-- Matriz de confusión:
-
-![Matriz de Confusión - KNN](https://via.placeholder.com/600x400?text=Matriz+de+Confusion+KNN)
-
-**Explicación de la matriz**: Muestra el rendimiento del modelo KNN en los datos de prueba. Los verdaderos negativos (arriba a la izquierda) y verdaderos positivos (abajo a la derecha) muestran predicciones correctas, mientras que los falsos positivos y falsos negativos muestran errores del modelo.
-
----
+- `n_neighbors = 9`
+- Usa la distancia euclidiana para clasificar según los vecinos más cercanos
 
 ### Modelo 2: Regresión Logística
-**Descripción**: Modelo lineal que usa función logística para clasificación binaria.
+- `solver='liblinear'`
+- Clasificador lineal que modela la probabilidad de supervivencia
 
-**Parámetros**:
-- solver = 'liblinear'
-- Regularización L2 (por defecto)
-
-**Rendimiento**:
-- **Precisión en datos de prueba: 70.96%**
-- Mejor rendimiento en identificación de patrones lineales
+### Modelo 3: KNN + SMOTE
+- Se aplica `SMOTE` para crear muestras sintéticas de la clase minoritaria
+- Busca mejorar el balance de clases antes de entrenar KNN
 
 ---
 
-## ⚖️ Balanceo de Clases
+## 🧾 Resultados de Evaluación
 
-El conjunto de datos original es desbalanceado:
-```
-Clase 0 (No sobrevivió): 549 muestras (61.6%)
-Clase 1 (Sobrevivió): 342 muestras (38.4%)
-```
+### Precisión en el conjunto de prueba
+- `KNN`: 66.99%
+- `Logistic Regression`: 68.65%
+- `KNN + SMOTE`: 65.68%
 
-![Distribución de Supervivencia](https://via.placeholder.com/600x400?text=Distribucion+de+Supervivencia)
+### Curva ROC / AUC
+- `AUC KNN`: 0.725
+- `AUC Logistic Regression`: 0.741
 
-**Explicación**: Este gráfico de barras muestra la distribución desigual de clases. Hay muchos más pasajeros que no sobrevivieron que pasajeros que sobrevivieron. Para tratar este desbalance, se aplicó SMOTE (Synthetic Minority Over-sampling Technique) en el segundo modelo.
-
-### Técnicas aplicadas:
-1. **RandomOverSampler**: Duplica muestras de la clase minoritaria
-   - Resultado: 549 muestras en cada clase
-
-2. **SMOTE**: Genera muestras sintéticas interpolando entre puntos de la clase minoritaria
-   - Resultado: Distribución balanceada con datos sintéticos
+### Validación cruzada (5 folds)
+- `KNN`: 0.687 ± 0.051
+- `Logistic Regression`: 0.703 ± 0.048
 
 ---
 
-## 📈 Modelo con Balanceo (SMOTE)
+## 🧠 Observaciones
 
-**Descripción**: KNN combinado con SMOTE para mejorar el rendimiento.
-
-**Pipeline**:
-1. Transformación de características (ColumnTransformer)
-2. Generación de muestras sintéticas (SMOTE)
-3. Clasificación con KNN
-
-**Rendimiento**:
-- **Precisión en datos de prueba: 66.99%**
-- Nota: La precisión disminuye pero el modelo es más robusto a nuevos datos
+- El mejor rendimiento de prueba se obtuvo con Regresión Logística.
+- El uso de SMOTE redujo la precisión en el conjunto de prueba, aunque puede ayudar a mejorar la sensibilidad en datos desbalanceados.
+- La variable `Sex` y la clase de pasajero (`Pclass`) son los factores más influyentes.
 
 ---
 
-## 🎯 Resultados Finales
+## 📁 Predicciones Finales
 
-### Comparación de Modelos:
-
-| Modelo | Precisión | Observaciones |
-|--------|-----------|---------------|
-| K-Nearest Neighbors (KNN) | 71.29% | Mejor rendimiento general |
-| Regresión Logística | 70.96% | Buena generalización |
-| KNN con SMOTE | 66.99% | Mayor robustez |
-
-### Predicciones:
-El modelo de Regresión Logística se utilizó para generar predicciones en el conjunto de prueba:
-- Muestras predichas como sobrevivientes: 126
-- Muestras predichas como no sobrevivientes: 292
+- El archivo `submission.csv` contiene las predicciones finales para el conjunto de prueba.
+- Formato: `PassengerId`, `Survived`
+- Predicciones generadas:
+  - `0` (no sobrevivió): 287 pasajeros
+  - `1` (sobrevivió): 131 pasajeros
 
 ---
 
-## 📁 Archivos de Salida
-
-- `submission.csv` - Archivo con las predicciones finales en formato requerido por Kaggle
-  - Columnas: PassengerId, Survived
-  - Formato: 419 filas (1 encabezado + 418 predicciones)
-
----
-
-## 🛠️ Herramientas y Librerías Utilizadas
+## 🛠️ Librerías Utilizadas
 
 ```python
-# Procesamiento de datos
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.model_selection import train_test_split, cross_val_score
+from sklearn.preprocessing import StandardScaler, KBinsDiscretizer, Binarizer
+from sklearn.compose import make_column_transformer
+from sklearn.pipeline import make_pipeline
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score, roc_curve, auc
+from imblearn.over_sampling import RandomOverSampler, SMOTE
+from imblearn.pipeline import make_pipeline as make_pipeline_imb
+```
 
-# Visualización
+---
+
+## ▶️ Cómo ejecutar
+
+1. Abrir `titanic.ipynb`.
+2. Ejecutar las celdas en orden.
+3. Revisar los gráficos en las celdas de visualización.
+4. El archivo `submission.csv` se genera al final del notebook.
+
 import seaborn as sns
 import matplotlib.pyplot as plt
 
