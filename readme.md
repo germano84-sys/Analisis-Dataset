@@ -100,7 +100,7 @@ Los gráficos generados se guardan en `figures/` y explican la distribución de 
 ### 2. Distribución de Tarifas
 ![Distribución de Tarifas](figures/fare_histogram.png)
 - La tarifa es muy asimétrica, con muchos montos bajos y algunos valores extremos altos.
-- Los valores altos suelen corresponder a pasajeros de primera clase.
+- Los valores altos, suelen corresponder a pasajeros de primera clase.
 - Por eso se normaliza la tarifa antes de entrenar los modelos.
 
 ### 3. Mapa de calor de valores faltantes
